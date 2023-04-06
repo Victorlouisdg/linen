@@ -2,10 +2,10 @@ import setuptools
 from setuptools import find_packages
 
 setuptools.setup(
-    name="{{cookiecutter.package_name}}",
+    name="linen",
     version="0.0.1",
-    author="{{cookiecutter.author_name}}",
-    author_email="{{cookiecutter.author_email}}",
+    author="Victor-Louis De Gusseme",
+    author_email="victorlouisdg@gmail.com",
     description="TODO",
     install_requires=[
         "numpy",
