@@ -12,13 +12,6 @@ from linen.path.path import Path
 from linen.path.speed import scale_speed
 
 speed = 0.1
-hover_height = 0.06
-approach_margin = 0.02
-approach_distance = 0.1
-
-approach_direction = np.array([1.0, 0.0, 0.0])
-grasp_location = approach_distance * approach_direction
-approach_angle = np.pi / 4
 
 start = np.zeros(3)
 end = np.array([0.0, 0.0, 0.25])
