@@ -1,6 +1,7 @@
 import airo_blender as ab
 import bpy
 import numpy as np
+import urdf_workshop
 
 from linen.blender.path import animate_object_along_path
 from linen.path.path import Path
@@ -16,9 +17,7 @@ def add_robotiq(closed=True) -> bpy.types.Object:
     Returns:
         The base of the gripper that allows posing the gripper.
     """
-    # TODO make this function more generally useful
-    urdf_path = "/home/idlab185/urdf-workshop/robotiq/robotiq_2f85_aprice/robotiq_2f85_v3.urdf"
-    gripper_joints, _, gripper_links = ab.import_urdf(urdf_path)
+    gripper_joints, _, gripper_links = ab.import_urdf(urdf_workshop.robotiq_2f85)
     gripper_bases = [link for link in gripper_links.values() if link.parent is None]
     gripper_base = gripper_bases[0]
 
