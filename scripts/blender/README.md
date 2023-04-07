@@ -11,3 +11,9 @@ In the subdirectories you can find additional visualizations that clarify detail
 ![Slide grasp](https://i.imgur.com/qpCIPgA.gif)
 
 An L-shaped grasp trajectory with a constant pitched orientation to slide underneath the a piece of cloth.
+
+### 02 - [Circular arc fold](02_circular_arc_fold.py)
+
+![Circular arc fold](https://i.imgur.com/WO6ndw3.gif)
+
+A circular folding path that start and end with a choosable pitched orientation.

@@ -4,6 +4,7 @@ import numpy as np
 from mathutils import Matrix
 
 from linen.blender.curve import add_discrete_curve, skin
+from linen.blender.frame import add_frames
 from linen.blender.points import add_points
 from linen.path.path import Path
 
@@ -25,6 +26,24 @@ def add_path(path: Path, points_per_second: int = 10, endpoint=True, radius=0.00
     points = [path(t) for t in np.linspace(path.start_time, path.end_time, n, endpoint=endpoint)]
     point_template = add_points(points, radius, color)
     return point_template
+
+
+def add_pose_path(path: Path, num_poses: int = 2, endpoint=True, size=0.1) -> bpy.types.Object:
+    """Visualizes a pose path as a series of frames.
+
+    Args:
+        path: The pose path to visualize.
+        num_poses: The number of poses to visualize.
+        endpoint: Whether to include the endpoint of the path, useful for visualizing consecutive paths.
+        size: The size of the frames.
+
+    Returns:
+        The object from which all frames are instanced.
+    """
+    times = np.linspace(path.start_time, path.end_time, num_poses, endpoint=endpoint)
+    poses = [path(t) for t in times]
+    frame_template = add_frames(poses, size)
+    return frame_template
 
 
 def animate_object_along_path(object: bpy.types.Object, pose_path: Path) -> None:

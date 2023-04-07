@@ -7,5 +7,6 @@
 
 
     "autoDocstring.docstringFormat": "google-notypes",
+    "python.formatting.provider": "black",
 
 }
