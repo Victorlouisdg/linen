@@ -17,3 +17,9 @@ An L-shaped grasp trajectory with a constant pitched orientation to slide undern
 ![Circular arc fold](https://i.imgur.com/WO6ndw3.gif)
 
 A circular folding path that start and end with a choosable pitched orientation.
+
+### 03 - [Lift and twist](03_lift_and_twist.py)
+![Lift and twist](https://i.imgur.com/Bmm5Scd.gif)
+
+A motion where the gripper move up in a straight line, but at the same time rotates 180 degress.
+This could be used e.g. after grasping the lowest point of a towel.
