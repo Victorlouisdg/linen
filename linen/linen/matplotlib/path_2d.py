@@ -74,7 +74,7 @@ def colorline(
     return lc
 
 
-def calculate_path_2D_limits(path: Path, num_path_samples: int = 100):
+def calculate_path_2d_limits(path: Path, num_path_samples: int = 100):
     x_min = np.inf
     x_max = -np.inf
     y_min = np.inf
@@ -102,7 +102,7 @@ def pad_limit(lim: np.ndarray, padding: float) -> np.ndarray:
     return np.array([low, high])
 
 
-def plot_path_2D(
+def plot_path_2d(
     path: Path,
     xlabel: str = "x",
     ylabel: str = "y",
@@ -115,7 +115,7 @@ def plot_path_2D(
 ):
 
     if xlim is None or ylim is None:
-        xlim_auto, ylim_auto = calculate_path_2D_limits(path)
+        xlim_auto, ylim_auto = calculate_path_2d_limits(path)
         if xlim is None:
             xlim = xlim_auto
         if ylim is None:
@@ -146,10 +146,10 @@ def plot_path_2D(
     return ax
 
 
-def animate_path_2D(path: Path, fps: float = 24.0):
+def animate_path_2d(path: Path, fps: float = 24.0):
     fig, ax = plt.subplots()
 
-    ax = plot_path_2D(path, ax=ax)
+    ax = plot_path_2d(path, ax=ax)
     point_artist = ax.plot([], [], "o", color="red")[0]
 
     plt.close()
