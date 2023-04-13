@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
@@ -146,7 +148,7 @@ def plot_path_2d(
     return ax
 
 
-def animate_path_2d(path: Path, fps: float = 24.0):
+def animate_path_2d(path: Path, fps: float = 24.0) -> Tuple[plt.Figure, plt.Axes, FuncAnimation]:
     fig, ax = plt.subplots()
 
     ax = plot_path_2d(path, ax=ax)
@@ -164,4 +166,4 @@ def animate_path_2d(path: Path, fps: float = 24.0):
     times = np.linspace(0, path.duration, num_frames)
 
     animation = FuncAnimation(fig, update, frames=times, interval=interval_in_milliseconds)
-    return animation
+    return fig, ax, animation

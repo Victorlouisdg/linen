@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
@@ -35,7 +37,7 @@ def plot_path_3d(
     padding: float = 0.1,
     grid: bool = True,
     ax: plt.Axes = None,
-):
+) -> plt.Axes:
     points = [path(t) for t in np.linspace(0, path.duration, 100)]
     xs, ys, zs = np.array(points).T
 
@@ -70,7 +72,7 @@ def plot_path_3d(
     return ax
 
 
-def animate_path_3d(path: Path, fps: float = 24.0):
+def animate_path_3d(path: Path, fps: float = 24.0) -> Tuple[plt.Figure, plt.Axes, FuncAnimation]:
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 
     ax = plot_path_3d(path, ax=ax)
@@ -89,4 +91,4 @@ def animate_path_3d(path: Path, fps: float = 24.0):
     times = np.linspace(0, path.duration, num_frames)
 
     animation = FuncAnimation(fig, update, frames=times, interval=interval_in_milliseconds)
-    return animation
+    return fig, ax, animation
