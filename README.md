@@ -1,6 +1,6 @@
 # Linen
 
-For visualizations see [scipts/blender](scripts/blender/).
+For visualizations see [scripts/blender](scripts/blender/).
 
 To learn Linen, see the [notebooks](notebooks/).
 
