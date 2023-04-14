@@ -1,9 +1,9 @@
 import numpy as np
 from airo_typing import Vector3DType
-from syncloth.paths.path import Path
 
 from linen.geometry.project import project_point_on_line
 from linen.geometry.rotate import rotate_orientation, rotate_point, rotate_pose
+from linen.path.path import Path
 
 
 def circular_arc_position_path(
