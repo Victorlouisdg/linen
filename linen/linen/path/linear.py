@@ -1,7 +1,8 @@
 from typing import Callable
 
 import numpy as np
-from syncloth.paths.path import Path
+
+from linen.path.path import Path
 
 
 def linear_interpolation(a: np.ndarray, b: np.ndarray) -> Callable[[float], np.ndarray]:

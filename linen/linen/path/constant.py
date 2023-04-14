@@ -1,5 +1,6 @@
 import numpy as np
-from syncloth.paths.path import Path
+
+from linen.path.path import Path
 
 
 def constant_trajectory(value: np.ndarray, duration: float) -> Path:

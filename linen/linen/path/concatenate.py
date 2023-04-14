@@ -1,7 +1,8 @@
 from typing import List
 
 import numpy as np
-from syncloth.paths.path import Path
+
+from linen.path.path import Path
 
 
 def concatenate_trajectories(trajectories: List[Path]) -> Path:
