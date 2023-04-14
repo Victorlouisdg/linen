@@ -9,6 +9,9 @@ setuptools.setup(
     description="TODO",
     install_requires=[
         "numpy",
+        "scipy",
+        "matplotlib",
+        "numdifftools",
     ],
     packages=find_packages(),
 )

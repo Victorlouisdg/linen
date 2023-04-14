@@ -111,7 +111,7 @@ def plot_path_2d(
     xlim: np.ndarray = None,
     ylim: np.ndarray = None,
     padding: float = 0.1,
-    cmap: ListedColormap = plt.get_cmap("hsv"),
+    cmap: ListedColormap = None,
     grid: bool = True,
     ax: plt.Axes = None,
 ):
@@ -143,7 +143,10 @@ def plot_path_2d(
     points = [path(t) for t in np.linspace(0, path.duration, 100)]
     xs, ys = np.array(points).T
 
-    colorline(ax, xs, ys, cmap=cmap)
+    if cmap is not None:
+        colorline(ax, xs, ys, cmap=cmap)
+    else:
+        ax.plot(xs, ys)
 
     return ax
 

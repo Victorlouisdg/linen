@@ -9,7 +9,7 @@ from linen.geometry.rotate import rotate_orientation
 from linen.path.combine import combine_orientation_and_position_paths
 from linen.path.linear import linear_trajectory
 from linen.path.path import Path
-from linen.path.speed import scale_speed
+from linen.path.reparametrization.speed import scale_speed
 
 speed = 0.1
 
