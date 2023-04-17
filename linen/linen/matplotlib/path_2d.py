@@ -129,9 +129,6 @@ def plot_path_2d(
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.set_autoscale_on(False)
-    ax.set_aspect("equal")
-
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_xlim(*tuple(xlim))
