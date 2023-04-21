@@ -41,6 +41,13 @@ class Path:
         return self.function(self.end_time)
 
     def __call__(self, t: float) -> np.ndarray:
+        # Solution to sampling outside of domain
+        # TODO: consider paths that go from large to small values
+        # e.g. a circular arc path from pi/4 to 0
+        if t > self.end_time:
+            t = self.end_time
+        if t < self.start_time:
+            t = self.start_time
         return self.function(t)
 
     # TODO considers adding either convencience (holding value) or assert for sampling outside of domain
