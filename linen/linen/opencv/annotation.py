@@ -27,21 +27,15 @@ num_clicks_required = {
 def draw_infinite_line(
     image: np.ndarray,
     point0: Tuple[int, int],
-    point1: Tuple[int, int],
+    direction: Tuple[int, int],
     color: Tuple[int, int, int] = (255, 255, 0),
 ) -> np.ndarray:
-    line_start = np.array(point0)
-    line_end = np.array(point1)
-    line_direction = line_end - line_start
-    line_length = np.linalg.norm(line_direction)
-    if line_length == 0:
-        return image
-    line_direction = line_direction / line_length
-    line_start = line_start - line_direction * 10000
-    line_end = line_end + line_direction * 10000
+    point = np.array(point0)
+    line_start = point - np.array(direction) * 1000
+    line_end = point + np.array(direction) * 1000
     line_start = tuple(line_start.astype(int))
     line_end = tuple(line_end.astype(int))
-    image = cv2.arrowedLine(image, line_start, line_end, color, 1)  # Arrow is currently off screen
+    image = cv2.line(image, line_start, line_end, color, 1)  # Arrow is currently off screen
     return image
 
 
@@ -101,14 +95,13 @@ def draw_line_segment_annotation(
 def draw_line_annotation(
     image: np.ndarray,
     point0: Tuple[int, int],
-    point1: Tuple[int, int],
+    direction: Tuple[int, int],
     name: str,
     color: Tuple[int, int, int] = (0, 255, 0),
 ) -> np.ndarray:
     text_location = (point0[0] + 8, point0[1])
     image = cv2.circle(image, point0, 3, color, -1)
-    image = cv2.circle(image, point1, 3, color, -1)
-    image = draw_infinite_line(image, point0, point1, color)
+    image = draw_infinite_line(image, point0, direction, color)
     image = cv2.putText(
         image,
         name,
@@ -158,7 +151,8 @@ def process_clicked_points(annotation_type: Annotation, clicked_points: list) ->
         annotation = clicked_points[0], clicked_points[1]
 
     if annotation_type == Annotation.Line:
-        annotation = clicked_points[0], clicked_points[1]
+        direction = tuple(np.array(clicked_points[1]) - np.array(clicked_points[0]))
+        annotation = clicked_points[0], direction
 
     if annotation_type == Annotation.BoundingBox:
         annotation = clicked_points[0], clicked_points[1]
@@ -206,7 +200,8 @@ def visualize_current_annotation(
         banner_text = f"Click to annotate line: {annotation_name}"
 
         if len(clicked_points) == 1:
-            draw_line_annotation(image, clicked_points[0], current_mouse_point, annotation_name)
+            direction = tuple(np.array(current_mouse_point) - np.array(clicked_points[0]))
+            draw_line_annotation(image, clicked_points[0], direction, annotation_name)
 
     if annotation_type == Annotation.BoundingBox:
         banner_text = f"Click to annotate bounding box: {annotation_name}"
