@@ -25,16 +25,20 @@ def circular_fold_trajectory(
     start_pitch_angle: float = np.pi / 4,
     end_pitch_angle: float = np.pi / 4,
     end_height_offset: float = 0.04,
-    speed: float = 0.25,
+    speed: float = 0.2,
 ):
+
+    fold_line_point, fold_line_direction = fold_line
+    start_height = grasp_location[2] - fold_line_point[2]
+
     grasp_projected = project_point_on_line(grasp_location, fold_line)
     radius = np.linalg.norm(grasp_projected - grasp_location)
-    angle_delta = np.arcsin(end_height_offset / radius)
-    max_angle = np.pi - angle_delta
+    start_angle_delta = np.arcsin(start_height / radius)
+    end_angle_delta = np.arcsin((start_height + end_height_offset) / radius)
+    max_angle = np.pi - start_angle_delta - end_angle_delta
 
     position_trajectory = circular_arc_position_trajectory(grasp_location, *fold_line, max_angle, speed)
 
-    _, fold_line_direction = fold_line
     middle_orientation = circular_fold_middle_orientation(approach_direction, fold_line_direction)
 
     start_orientation_flat = flat_orientation(approach_direction)

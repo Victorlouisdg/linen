@@ -65,7 +65,7 @@ def slide_grasp_trajectory(
     approach_distance: float = 0.05,
     approach_angle: float = np.pi / 4,
     hover_height: float = 0.05,
-    speed: float = 0.1,
+    speed: float = 0.05,
 ) -> Path:
     """
     The pose trajectory for a slide grasp. Combines the L-shaped position trajectory and a constant orientation

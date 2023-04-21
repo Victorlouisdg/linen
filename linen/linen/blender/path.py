@@ -3,10 +3,11 @@ import bpy
 import numpy as np
 from mathutils import Matrix
 
-from linen.blender.curve import add_discrete_curve, skin
+from linen.blender.curve import add_discrete_curve_mesh, skin
 from linen.blender.frame import add_frames
 from linen.blender.points import add_points
 from linen.path.path import Path
+from linen.path.split import split_pose_path
 
 
 def add_path(path: Path, points_per_second: int = 10, endpoint=True, radius=0.004, color=None) -> bpy.types.Object:
@@ -80,7 +81,7 @@ def add_growing_path(path, radius=0.005, color=None):
     num_frames = int(np.ceil(path.duration / frame_interval))
 
     curve_points = [path(t) for t in np.linspace(path.start_time, path.end_time, num_frames)]
-    curve_mesh = add_discrete_curve(curve_points)
+    curve_mesh = add_discrete_curve_mesh(curve_points)
 
     if color is not None:
         ab.add_material(curve_mesh, color=color)
@@ -89,3 +90,16 @@ def add_growing_path(path, radius=0.005, color=None):
     build_modifier.frame_start = 1
     build_modifier.frame_duration = num_frames
     skin(curve_mesh, radius=radius)
+
+
+def add_linen_trajectory_visualization(
+    pose_trajectory: Path, num_poses: int = 2, points_per_second: int = 10, pose_size: float = 0.1
+) -> bpy.types.Object:
+    _, position_trajectory = split_pose_path(pose_trajectory)
+
+    red = (1.0, 0.0, 0.0)
+    soft_yellow = (1.0, 0.8, 0.1)
+
+    add_path(position_trajectory, points_per_second=points_per_second, color=red)
+    add_growing_path(position_trajectory, color=soft_yellow)
+    add_pose_path(pose_trajectory, num_poses=num_poses, size=pose_size)
