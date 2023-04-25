@@ -73,7 +73,7 @@ def circular_arc_position_trajectory(
     axis: Vector3DType,
     max_angle: float,
     speed: float,
-) -> Vector3DType:
+) -> Path:
     """
     A trajectory of points on a circular arc in function of time, created by rotating a start point.
 
@@ -109,7 +109,7 @@ def circular_arc_trajectory(
     axis: Vector3DType,
     max_angle: float,
     speed: float,
-) -> Vector3DType:
+) -> Path:
     """
     A trajectory of poses on a circular arc in function of time, created by rotating a start pose.
 
