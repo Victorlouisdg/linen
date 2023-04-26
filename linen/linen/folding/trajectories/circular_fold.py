@@ -8,6 +8,7 @@ from linen.geometry.project import project_point_on_line
 from linen.path.circular_arc import circular_arc_orientation_path, circular_arc_position_trajectory
 from linen.path.combine import combine_orientation_and_position_paths
 from linen.path.slerp import slerp_trajectory
+from linen.path.path import Path
 
 
 def circular_fold_middle_orientation(approach_direction: Vector3DType, fold_line_direction: Vector3DType) -> Path:
