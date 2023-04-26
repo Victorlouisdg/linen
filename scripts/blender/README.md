@@ -23,3 +23,12 @@ A circular folding path that start and end with a choosable pitched orientation.
 
 A motion where the gripper move up in a straight line, but at the same time rotates 180 degress.
 This could be used e.g. after grasping the lowest point of a towel.
+
+### 04 - [Fling](04_fling.py)
+Work in progress.
+
+### 05 - [Rotate](05_rotate.py)
+![Rotate](https://i.imgur.com/VNM67g8.png)
+
+A dual arm motion where two grippers rotate around their common center.
+This is useful for example when you've folded a towel once, and want to fold it a second time with fold arcs in the same direction.
