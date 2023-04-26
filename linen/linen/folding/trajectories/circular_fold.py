@@ -10,7 +10,7 @@ from linen.path.combine import combine_orientation_and_position_paths
 from linen.path.slerp import slerp_trajectory
 
 
-def circular_fold_middle_orientation(approach_direction: Vector3DType, fold_line_direction: Vector3DType):
+def circular_fold_middle_orientation(approach_direction: Vector3DType, fold_line_direction: Vector3DType) -> Path:
     start_orientation_flat = flat_orientation(approach_direction)
 
     orientation_path = circular_arc_orientation_path(start_orientation_flat, fold_line_direction, np.pi)
@@ -26,7 +26,17 @@ def circular_fold_trajectory(
     end_pitch_angle: float = np.pi / 4,
     end_height_offset: float = 0.04,
     speed: float = 0.2,
-):
+) -> Path:
+    """
+    TODO: make doc.
+
+    Args:
+        fold_line: towel center and fold line direction. You can use linen.folding.fold_lines.towel.towel_fold_line(keypoints) method.
+
+
+    Returns:
+        The path of a circular fold.
+    """
 
     fold_line_point, fold_line_direction = fold_line
     start_height = grasp_location[2] - fold_line_point[2]
