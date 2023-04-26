@@ -7,8 +7,8 @@ from linen.geometry.orientation import flat_orientation, pitch_gripper_orientati
 from linen.geometry.project import project_point_on_line
 from linen.path.circular_arc import circular_arc_orientation_path, circular_arc_position_trajectory
 from linen.path.combine import combine_orientation_and_position_paths
-from linen.path.slerp import slerp_trajectory
 from linen.path.path import Path
+from linen.path.slerp import slerp_trajectory
 
 
 def circular_fold_middle_orientation(approach_direction: Vector3DType, fold_line_direction: Vector3DType) -> Path:
@@ -32,11 +32,17 @@ def circular_fold_trajectory(
     TODO: make doc.
 
     Args:
-        fold_line: towel center and fold line direction. You can use linen.folding.fold_lines.towel.towel_fold_line(keypoints) method.
+        grasp_location: The location of the grasp, i.e. where the gripper closes.
+        approach_direction: The approach direction of the gripper.
+        fold_line: Towel center and fold line direction. You can use linen.folding.fold_lines.towel.towel_fold_line(keypoints) method.
+        start_pitch_angle: The pitch angle of the gripper at the start of the fold.
+        end_pitch_angle: The pitch angle of the gripper at the end of the fold.
+        end_height_offset: The height offset of the gripper at the end of the fold.
+        speed: The constant speed of the gripper alond the fold arc.
 
 
     Returns:
-        The path of a circular fold.
+        The circular fold trajectory.
     """
 
     fold_line_point, fold_line_direction = fold_line

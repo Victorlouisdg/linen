@@ -12,7 +12,7 @@ dependencies:
   - pytorch
   - cudatoolkit=11.3
   - torchvision
-  - opencv
+  - opencv=4.7.0
   - pip
   - pip:
     - numpy
