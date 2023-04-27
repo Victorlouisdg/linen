@@ -91,7 +91,7 @@ for vertex in towel.data.vertices:
     vertex.co += Vector(drag_translation_estimate)
 
 
-rotate_grasp_left, rotate_grasp_right = towel_twisted_grasps(keypoints_after_drag, grasp_depth=grasp_depth)
+rotate_grasp_right, rotate_grasp_left = towel_twisted_grasps(keypoints_after_drag, grasp_depth=grasp_depth)
 rotate_grasp_location_left, rotate_grasp_approach_direction_left = rotate_grasp_left
 rotate_grasp_location_right, rotate_grasp_approach_direction_right = rotate_grasp_right
 

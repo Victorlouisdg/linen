@@ -56,13 +56,13 @@ def towel_twisted_grasps(ordered_keypoints: List[np.ndarray], grasp_depth: float
     left_top_to_bottom = ordered_keypoints[3] - ordered_keypoints[0]
     right_bottom_to_top = ordered_keypoints[1] - ordered_keypoints[2]
 
-    approach_direction_left = left_top_to_bottom
-    approach_direction_right = right_bottom_to_top
+    approach_direction_top = left_top_to_bottom
+    approach_direction_bottom = right_bottom_to_top
 
-    approach_direction_left[2] = 0
-    approach_direction_right[2] = 0
-    approach_direction_left /= np.linalg.norm(approach_direction_left)
-    approach_direction_right /= np.linalg.norm(approach_direction_right)
+    approach_direction_top[2] = 0
+    approach_direction_bottom[2] = 0
+    approach_direction_top /= np.linalg.norm(approach_direction_top)
+    approach_direction_bottom /= np.linalg.norm(approach_direction_bottom)
 
     top_right_to_left = ordered_keypoints[1] - ordered_keypoints[0]
     top_right_to_left /= np.linalg.norm(top_right_to_left)
@@ -70,13 +70,13 @@ def towel_twisted_grasps(ordered_keypoints: List[np.ndarray], grasp_depth: float
     bottom_left_to_right = ordered_keypoints[3] - ordered_keypoints[2]
     bottom_left_to_right /= np.linalg.norm(bottom_left_to_right)
 
-    location_left = ordered_keypoints[0] + 0.05 * top_right_to_left + grasp_depth * approach_direction_left
-    location_right = ordered_keypoints[2] + 0.05 * bottom_left_to_right + grasp_depth * approach_direction_right
+    location_top = ordered_keypoints[0] + 0.05 * top_right_to_left + grasp_depth * approach_direction_top
+    location_bottom = ordered_keypoints[2] + 0.05 * bottom_left_to_right + grasp_depth * approach_direction_bottom
 
-    grasp_left = (location_left, approach_direction_left)
-    grasp_right = (location_right, approach_direction_right)
+    grasp_top = (location_top, approach_direction_top)
+    grasp_bottom = (location_bottom, approach_direction_bottom)
 
-    return grasp_left, grasp_right
+    return grasp_top, grasp_bottom
 
 
 # def towel_opposing_grasps(ordered_keypoints, parallel_near_edge=(0, 1)):
