@@ -5,23 +5,14 @@
 # to update: conda env update -f environment.yaml
 name: linen
 channels:
-  - pytorch
   - conda-forge
 dependencies:
   - python=3.10
-  - pytorch
-  - cudatoolkit=11.3
-  - torchvision
   - pip
   - pip:
     - numpy
     - matplotlib
     - scipy
-    - wandb
-    - pytorch-lightning
-    - imageio
-    - albumentations
-    - timm
     - pytest
     - pre-commit
     - mypy
