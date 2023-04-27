@@ -9,7 +9,6 @@ from linen.blender.render_setups import setup_cycles, setup_white_background
 from linen.blender.robotics.robotiq import add_animated_robotiq
 from linen.folding.fold_lines.towel import towel_fold_line
 from linen.folding.ordered_keypoints import get_counterclockwise_ordered_keypoints
-from linen.folding.trajectories.circular_fold import circular_fold_trajectory
 from linen.grasping.slide_grasp import slide_grasp_trajectory
 from linen.grasping.towel.towel_grasps import towel_aligned_grasps
 from linen.path.concatenate import concatenate_trajectories
@@ -25,13 +24,25 @@ towel = add_plane(towel_width, towel_length)
 towel.location.z = table.location.z
 
 bpy.context.view_layer.update()
+
+# Determine only fold line from original keypoints
 keypoints_3D = [towel.matrix_world @ v.co for v in towel.data.vertices]
 ordered_keypoints = get_counterclockwise_ordered_keypoints(keypoints_3D)
-
 fold_line = towel_fold_line(ordered_keypoints)
 
+
+# To make the towel look folded, snap the points with positive y to y=0.
+for vertex in towel.data.vertices:
+    if vertex.co.y > 0.0:
+        vertex.co.y = 0.0
+
+
+keypoints_after_fold_3D = [towel.matrix_world @ v.co for v in towel.data.vertices]
+ordered_keypoints_after_fold = get_counterclockwise_ordered_keypoints(keypoints_after_fold_3D)
+
+
 grasp_depth = 0.05
-grasp_left, grasp_right = towel_aligned_grasps(ordered_keypoints, grasp_depth=grasp_depth)
+grasp_left, grasp_right = towel_aligned_grasps(ordered_keypoints_after_fold, grasp_depth=grasp_depth)
 grasp_location_left, grasp_direction_left = grasp_left
 grasp_location_right, grasp_direction_right = grasp_right
 
@@ -50,30 +61,24 @@ grasp_trajectory_right = slide_grasp_trajectory(
     grasp_location_right, grasp_direction_right, approach_angle=approach_angle, approach_distance=approach_distance
 )
 
-fold_arc_trajectory_left = circular_fold_trajectory(
-    grasp_location_left, grasp_direction_left, fold_line, start_pitch_angle=approach_angle
-)
 
-fold_arc_trajectory_right = circular_fold_trajectory(
-    grasp_location_right, grasp_direction_right, fold_line, start_pitch_angle=approach_angle
-)
-
-
-def move_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, speed: float):
+def slide_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, speed: float):
     start_position = start_pose[:3, 3]
     gripper_backwards = -start_pose[:3, 2]  # Z is forward by our convention
-    end_position = start_position + distance * gripper_backwards
+    gripper_backwards_projected = gripper_backwards.copy()
+    gripper_backwards_projected[2] = 0.0
+    gripper_backwards_projected /= np.linalg.norm(gripper_backwards_projected)
+    end_position = start_position + distance * gripper_backwards_projected
     orientation = start_pose[:3, :3]
     return linear_constant_orientation_trajectory(start_position, end_position, orientation, speed)
 
 
-retreat_trajectory_left = move_gripper_backwards_trajectory(fold_arc_trajectory_left.end, grasp_depth, 0.1)
-retreat_trajectory_right = move_gripper_backwards_trajectory(fold_arc_trajectory_right.end, grasp_depth, 0.1)
+drag_distance = towel_length / 4.0
+drag_trajectory_left = slide_gripper_backwards_trajectory(grasp_trajectory_left.end, drag_distance, 0.05)
+drag_trajectory_right = slide_gripper_backwards_trajectory(grasp_trajectory_right.end, drag_distance, 0.05)
 
-trajectory_left = concatenate_trajectories([grasp_trajectory_left, fold_arc_trajectory_left, retreat_trajectory_left])
-trajectory_right = concatenate_trajectories(
-    [grasp_trajectory_right, fold_arc_trajectory_right, retreat_trajectory_right]
-)
+trajectory_left = concatenate_trajectories([grasp_trajectory_left, drag_trajectory_left])
+trajectory_right = concatenate_trajectories([grasp_trajectory_right, drag_trajectory_right])
 
 
 # Visualization

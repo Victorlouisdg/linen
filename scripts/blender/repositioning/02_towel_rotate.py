@@ -1,18 +1,20 @@
 import airo_blender as ab
 import bpy
 import numpy as np
+from mathutils import Vector
 
-from linen.blender.curve import add_line_segment
 from linen.blender.path import add_linen_trajectory_visualization
 from linen.blender.plane import add_plane
+from linen.blender.points import add_points
 from linen.blender.render_setups import setup_cycles, setup_white_background
 from linen.blender.robotics.robotiq import add_animated_robotiq
 from linen.folding.fold_lines.towel import towel_fold_line
 from linen.folding.ordered_keypoints import get_counterclockwise_ordered_keypoints
 from linen.grasping.slide_grasp import slide_grasp_trajectory
-from linen.grasping.towel.towel_grasps import towel_aligned_grasps
+from linen.grasping.towel.towel_grasps import towel_aligned_grasps, towel_twisted_grasps
 from linen.path.concatenate import concatenate_trajectories
 from linen.path.linear import linear_constant_orientation_trajectory
+from linen.repositioning.rotate import rotate_trajectories
 
 bpy.ops.object.delete()
 
@@ -30,7 +32,6 @@ keypoints_3D = [towel.matrix_world @ v.co for v in towel.data.vertices]
 ordered_keypoints = get_counterclockwise_ordered_keypoints(keypoints_3D)
 fold_line = towel_fold_line(ordered_keypoints)
 
-
 # To make the towel look folded, snap the points with positive y to y=0.
 for vertex in towel.data.vertices:
     if vertex.co.y > 0.0:
@@ -46,7 +47,7 @@ grasp_left, grasp_right = towel_aligned_grasps(ordered_keypoints_after_fold, gra
 grasp_location_left, grasp_direction_left = grasp_left
 grasp_location_right, grasp_direction_right = grasp_right
 
-height_offset = 0.02
+height_offset = 0.025
 grasp_location_left[2] += height_offset
 grasp_location_right[2] += height_offset
 
@@ -77,8 +78,48 @@ drag_distance = towel_length / 4.0
 drag_trajectory_left = slide_gripper_backwards_trajectory(grasp_trajectory_left.end, drag_distance, 0.05)
 drag_trajectory_right = slide_gripper_backwards_trajectory(grasp_trajectory_right.end, drag_distance, 0.05)
 
-trajectory_left = concatenate_trajectories([grasp_trajectory_left, drag_trajectory_left])
-trajectory_right = concatenate_trajectories([grasp_trajectory_right, drag_trajectory_right])
+
+drag_translation_left = drag_trajectory_left.end[:3, 3] - grasp_trajectory_left.end[:3, 3]
+drag_translation_right = drag_trajectory_right.end[:3, 3] - grasp_trajectory_right.end[:3, 3]
+drag_translation_estimate = (drag_translation_left + drag_translation_right) / 2
+
+keypoints_after_drag = ordered_keypoints_after_fold + drag_translation_estimate
+
+
+# Just for visuals
+for vertex in towel.data.vertices:
+    vertex.co += Vector(drag_translation_estimate)
+
+
+rotate_grasp_left, rotate_grasp_right = towel_twisted_grasps(keypoints_after_drag, grasp_depth=grasp_depth)
+rotate_grasp_location_left, rotate_grasp_approach_direction_left = rotate_grasp_left
+rotate_grasp_location_right, rotate_grasp_approach_direction_right = rotate_grasp_right
+
+rotate_grasp_location_left[2] += height_offset
+rotate_grasp_location_right[2] += height_offset
+
+
+rotate_grasp_trajectory_left = slide_grasp_trajectory(
+    rotate_grasp_location_left,
+    rotate_grasp_approach_direction_left,
+    approach_angle=approach_angle,
+    approach_distance=approach_distance,
+)
+
+rotate_grasp_trajectory_right = slide_grasp_trajectory(
+    rotate_grasp_location_right,
+    rotate_grasp_approach_direction_right,
+    approach_angle=approach_angle,
+    approach_distance=approach_distance,
+)
+
+rotate_trajectory_left, rotate_trajectory_right = rotate_trajectories(
+    rotate_grasp_trajectory_left.end, rotate_grasp_trajectory_right.end, np.pi / 2
+)
+
+
+trajectory_left = concatenate_trajectories([rotate_grasp_trajectory_left, rotate_trajectory_left])
+trajectory_right = concatenate_trajectories([rotate_grasp_trajectory_right, rotate_trajectory_right])
 
 
 # Visualization
@@ -89,11 +130,10 @@ towel.modifiers.new("Solidify", "SOLIDIFY")
 towel.modifiers["Solidify"].thickness = 0.003
 towel.modifiers["Solidify"].offset = 0.0
 
-fold_line_point, fold_line_direction = fold_line
-fold_line_start = fold_line_point - fold_line_direction * 0.55 * towel_width
-fold_line_end = fold_line_point + fold_line_direction * 0.55 * towel_width
-fold_line_object = add_line_segment(fold_line_start, fold_line_end)
-ab.add_material(fold_line_object, [1.000000, 0.404182, 0.011072, 1.000000])
+orange = [1.0, 0.27, 0.0, 1.0]
+center = (rotate_trajectory_left.start[:3, 3] + rotate_trajectory_right.start[:3, 3]) / 2
+add_points([center], radius=0.01, color=orange)
+
 
 add_linen_trajectory_visualization(trajectory_left, pose_size=0.05)
 add_linen_trajectory_visualization(trajectory_right, pose_size=0.05)
