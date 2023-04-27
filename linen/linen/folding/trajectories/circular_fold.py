@@ -31,10 +31,12 @@ def circular_fold_trajectory(
     """
     TODO: make doc.
 
+    For towels, you can use linen.folding.fold_lines.towel.towel_fold_line(keypoints) method.
+
     Args:
         grasp_location: The location of the grasp, i.e. where the gripper closes.
         approach_direction: The approach direction of the gripper.
-        fold_line: Towel center and fold line direction. You can use linen.folding.fold_lines.towel.towel_fold_line(keypoints) method.
+        fold_line: Point on the fold line and fold line direction.
         start_pitch_angle: The pitch angle of the gripper at the start of the fold.
         end_pitch_angle: The pitch angle of the gripper at the end of the fold.
         end_height_offset: The height offset of the gripper at the end of the fold.
