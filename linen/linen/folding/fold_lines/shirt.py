@@ -4,7 +4,9 @@ import numpy as np
 from airo_typing import Vector3DType
 
 
-def shirt_sleeve_and_side_fold_line(keypoints: Dict[str, Vector3DType]) -> Tuple[Vector3DType, Vector3DType]:
+def shirt_sleeve_and_side_fold_line(
+    keypoints: Dict[str, Vector3DType], left=True, offset_from_armpit_fraction=1.0 / 6.0
+) -> Tuple[Vector3DType, Vector3DType]:
     """
     The vertical fold line that fold the side of a shirt inwards, including the sleeve.
 
@@ -24,6 +26,8 @@ def shirt_sleeve_and_side_fold_line(keypoints: Dict[str, Vector3DType]) -> Tuple
 
     Args:
         keypoints: The keypoints of the shirt.
+        left: Whether to fold the left or right side.
+        offset_from_armpit_fraction: The fraction of the distance between the two armpits to offset the fold line
 
     Returns:
         The fold line as a tuple of a point and a direction vector.
@@ -48,7 +52,11 @@ def shirt_sleeve_and_side_fold_line(keypoints: Dict[str, Vector3DType]) -> Tuple
     bottom_to_top = top_center - bottom_center
     bottom_to_top /= np.linalg.norm(bottom_to_top)
 
-    return bottom_center, bottom_to_top
+    if left:
+        fold_line_point = armpit_left + offset_from_armpit_fraction * (armpit_right - armpit_left)
+        fold_line_direction = bottom_to_top
+    else:
+        fold_line_point = armpit_right + offset_from_armpit_fraction * (armpit_left - armpit_right)
+        fold_line_direction = -bottom_to_top
 
-    # TODO determine where to lie the fold line?
-    # armpit_left + 0.25 * (armpit_right - armpit_left)?
+    return fold_line_point, fold_line_direction
