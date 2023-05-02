@@ -5,7 +5,7 @@ import numpy as np
 from linen.grasping.edge_grasps import orthogonal_insetted_edge_grasps
 
 
-def towel_aligned_grasps(ordered_keypoints, grasp_depth=0.05, inset=0.05):
+def towel_aligned_grasps(ordered_keypoints, grasp_depth=0.05, inset=0.05, grasped_edge: int = 0):
     """Two parallel grasps on the same edge.
 
        |  |
@@ -20,19 +20,24 @@ def towel_aligned_grasps(ordered_keypoints, grasp_depth=0.05, inset=0.05):
         ordered_keypoints: The keypoints of the towel ordered counterclockwise.
         grasp_depth: The depth of the grasp.
         inset: The distance along the edge to inset the grasp locations.
+        grasped_edge: The edge to grasp.
 
     Returns:
-        The two grasp locations, the first will be the grasp at the top edge of the towel.
+        The two grasp locations on the selected edge.
 
     """
 
     # TODO: Do we need to grasp other edges of the towel?
-    edge_start = ordered_keypoints[0]
-    edge_end = ordered_keypoints[1]
+    edges = [(0, 1), (1, 2), (2, 3), (3, 0)]  # edge 0, 1, 2, 3
+    start, end = edges[grasped_edge]
+    edge_start = ordered_keypoints[start]
+    edge_end = ordered_keypoints[end]
     return orthogonal_insetted_edge_grasps(edge_start, edge_end, grasp_depth, inset)
 
 
-def towel_twisted_grasps(ordered_keypoints: List[np.ndarray], grasp_depth: float = 0.05, inset: float = 0.05, top_grasp_near0: bool = True):
+def towel_twisted_grasps(
+    ordered_keypoints: List[np.ndarray], grasp_depth: float = 0.05, inset: float = 0.05, top_grasp_near0: bool = True
+):
     """Two opposing grasps that are also not aliged with each other.
 
 
@@ -50,6 +55,7 @@ def towel_twisted_grasps(ordered_keypoints: List[np.ndarray], grasp_depth: float
         ordered_keypoints: The keypoints of the towel ordered counterclockwise.
         grasp_depth: The depth of the grasp.
         inset: The distance along the edge to inset the grasp locations.
+        top_grasp_near0: Whether the grasp at the top edge of the towel should be near the first keypoint.
 
     Returns:
         The two grasp locations, the first will be the grasp at the top edge of the towel.
@@ -84,7 +90,7 @@ def towel_twisted_grasps(ordered_keypoints: List[np.ndarray], grasp_depth: float
         location_bottom = ordered_keypoints[3] - inset * left_to_right
 
     location_top += grasp_depth * approach_direction_top
-    location_bottom += grasp_depth * approach_direction_bottom 
+    location_bottom += grasp_depth * approach_direction_bottom
 
     grasp_top = (location_top, approach_direction_top)
     grasp_bottom = (location_bottom, approach_direction_bottom)
