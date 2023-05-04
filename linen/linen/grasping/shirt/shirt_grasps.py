@@ -8,6 +8,7 @@ def shirt_sleeve_and_waist_grasps(
     sleeve_inset = 0.05,
     waist_inset = 0.05,
     grasp_depth = 0.05,
+    left=True
 ) -> Tuple[Tuple[Vector3DType, Vector3DType], Tuple[Vector3DType, Vector3DType]]:
     """
     The vertical fold line that fold the side of a shirt inwards, including the sleeve.
@@ -55,18 +56,24 @@ def shirt_sleeve_and_waist_grasps(
     bottom_to_top = top_center - bottom_center
     bottom_to_top /= np.linalg.norm(bottom_to_top)
 
-    sleeve_to_shoulder = shoulder_left - sleeve_top_left
-    sleeve_to_shoulder /= np.linalg.norm(sleeve_to_shoulder)
-
 
     sleeve_grasp_approach_direction = -bottom_to_top
-    sleeve_grasp_location = sleeve_top_left + sleeve_inset * sleeve_to_shoulder 
-    
-    waist_left_to_right = waist_right - waist_left
-
     waist_grasp_approach_direction = bottom_to_top
-    waist_grasp_location = waist_left + waist_inset * waist_left_to_right
 
+    if left:
+        sleeve_to_shoulder = shoulder_left - sleeve_top_left
+        sleeve_to_shoulder /= np.linalg.norm(sleeve_to_shoulder)
+        sleeve_grasp_location = sleeve_top_left + sleeve_inset * sleeve_to_shoulder 
+        waist_left_to_right = waist_right - waist_left
+        waist_grasp_location = waist_left + waist_inset * waist_left_to_right
+    else:
+        sleeve_to_shoulder = shoulder_right - sleeve_top_right
+        sleeve_to_shoulder /= np.linalg.norm(sleeve_to_shoulder)
+        sleeve_grasp_location = sleeve_top_right + sleeve_inset * sleeve_to_shoulder
+        waist_right_to_left = waist_left - waist_right
+        waist_grasp_location = waist_right + waist_inset * waist_right_to_left
+
+    # Add grasp depth
     sleeve_grasp_location += grasp_depth * sleeve_grasp_approach_direction 
     waist_grasp_location += grasp_depth * waist_grasp_approach_direction
 

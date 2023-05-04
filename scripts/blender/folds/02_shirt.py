@@ -1,6 +1,10 @@
+from linen.elemental.move_backwards import move_gripper_backwards_trajectory
 from linen.folding.fold_lines.shirt import shirt_sleeve_and_side_fold_line
 import airo_blender as ab
 import bpy
+from linen.geometry.intersect import intersect_lines
+from linen.geometry.project import project_point_on_line
+from linen.grasping.edge_grasps import orthogonal_insetted_edge_grasps
 from linen.grasping.shirt.shirt_grasps import shirt_sleeve_and_waist_grasps
 from linen.path.reparametrization.speed import scale_speed
 import numpy as np
@@ -32,21 +36,72 @@ keypoints_3D = keypoints.values()
 
 add_discrete_curve(vertices, closed=True)
 
-fold_line = shirt_sleeve_and_side_fold_line(keypoints)
-
 grasp_depth = 0.05
-grasp_left, grasp_right = shirt_sleeve_and_waist_grasps(keypoints, grasp_depth=grasp_depth, waist_inset=0.0)
+height_offset = 0.025
+approach_angle = np.pi / 4
+approach_margin = 0.03
+approach_distance = grasp_depth + approach_margin
+shirt_left_side = False
+middle_fold = True
+
+if middle_fold:
+    waist_left = keypoints["waist_left"]
+    waist_right = keypoints["waist_right"]
+    neck_left = keypoints["neck_left"]
+    neck_right = keypoints["neck_right"]
+
+    fold_line_left = shirt_sleeve_and_side_fold_line(keypoints, left=True, offset_from_armpit_fraction=1.0/5)
+    fold_line_right = shirt_sleeve_and_side_fold_line(keypoints, left=False, offset_from_armpit_fraction=1.0/5)
+
+    waist_left_to_right = waist_right - waist_left
+    waist_left_to_right /= np.linalg.norm(waist_left_to_right)
+
+    waist_line = (waist_left, waist_left_to_right)
+
+    fold_line_left_point = fold_line_left[0]
+    fold_line_right_point = fold_line_right[0]
+
+    waist_left_fold_point = project_point_on_line(fold_line_left_point, waist_line)
+    waist_right_fold_point = project_point_on_line(fold_line_right_point, waist_line)
+    
+
+    neck_left_to_right = neck_right - neck_left
+    neck_left_to_right /= np.linalg.norm(neck_left_to_right)
+    
+    left_to_right = neck_left_to_right + waist_left_to_right
+    left_to_right /= np.linalg.norm(left_to_right)
+
+    fold_line_direction = -left_to_right
+
+    neck_middle = (neck_left + neck_right) / 2
+    waist_middle = (waist_left + waist_right) / 2
+    shirt_middle = (neck_middle + waist_middle) / 2
+
+    fold_line = (shirt_middle, fold_line_direction)
+
+    # calculate grasps
+    grasp_left, grasp_right = orthogonal_insetted_edge_grasps(
+        waist_left_fold_point, waist_right_fold_point, grasp_depth=grasp_depth, inset=0.03
+    )
+
+    print(grasp_left, grasp_right)
+
+else:
+    fold_line = shirt_sleeve_and_side_fold_line(keypoints, left=shirt_left_side, offset_from_armpit_fraction=1.0/5)
+    sleeve_grasp, waist_grasp = shirt_sleeve_and_waist_grasps(keypoints, grasp_depth=grasp_depth, waist_inset=0.03, left=shirt_left_side)
+
+    if shirt_left_side:
+        grasp_left = sleeve_grasp
+        grasp_right = waist_grasp
+    else:
+        grasp_left = waist_grasp
+        grasp_right = sleeve_grasp
 
 grasp_location_left, grasp_direction_left = grasp_left
 grasp_location_right, grasp_direction_right = grasp_right
 
-height_offset = 0.025
 grasp_location_left[2] += height_offset
 grasp_location_right[2] += height_offset
-
-approach_angle = np.pi / 4
-approach_margin = 0.03
-approach_distance = grasp_depth + approach_margin
 
 grasp_trajectory_left = slide_grasp_trajectory(
     grasp_location_left, grasp_direction_left, approach_angle=approach_angle, approach_distance=approach_distance
@@ -56,11 +111,11 @@ grasp_trajectory_right = slide_grasp_trajectory(
 )
 
 fold_arc_trajectory_left = circular_fold_trajectory(
-    grasp_location_left, grasp_direction_left, fold_line, start_pitch_angle=approach_angle
+    grasp_location_left, grasp_direction_left, fold_line, start_pitch_angle=approach_angle, speed=0.1
 )
 
 fold_arc_trajectory_right = circular_fold_trajectory(
-    grasp_location_right, grasp_direction_right, fold_line, start_pitch_angle=approach_angle
+    grasp_location_right, grasp_direction_right, fold_line, start_pitch_angle=approach_angle, speed=0.1
 )
 
 duration_left = fold_arc_trajectory_left.duration
@@ -74,14 +129,6 @@ elif duration_right > duration_left:
     # slow down left
     factor = duration_left / duration_right
     fold_arc_trajectory_left = scale_speed(fold_arc_trajectory_left, factor)
-
-
-def move_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, speed: float):
-    start_position = start_pose[:3, 3]
-    gripper_backwards = -start_pose[:3, 2]  # Z is forward by our convention
-    end_position = start_position + distance * gripper_backwards
-    orientation = start_pose[:3, :3]
-    return linear_constant_orientation_trajectory(start_position, end_position, orientation, speed)
 
 
 retreat_trajectory_left = move_gripper_backwards_trajectory(fold_arc_trajectory_left.end, grasp_depth, 0.1)
