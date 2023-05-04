@@ -18,6 +18,13 @@ def circular_fold_middle_orientation(approach_direction: Vector3DType, fold_line
     middle_orientation = orientation_path(np.pi / 2)
     return middle_orientation
 
+def circular_fold_end_orientation(approach_direction: Vector3DType, fold_line_direction: Vector3DType) -> Path:
+    start_orientation_flat = flat_orientation(approach_direction)
+
+    orientation_path = circular_arc_orientation_path(start_orientation_flat, fold_line_direction, np.pi)
+    end_orientation = orientation_path(np.pi)
+    return end_orientation
+
 
 def circular_fold_trajectory(
     grasp_location: Vector3DType,
@@ -60,7 +67,9 @@ def circular_fold_trajectory(
 
     start_orientation_flat = flat_orientation(approach_direction)
     start_orientation = pitch_gripper_orientation(start_orientation_flat, -start_pitch_angle)
-    end_orientation = pitch_gripper_orientation(start_orientation_flat, end_pitch_angle - np.pi)
+
+    end_orientation = circular_fold_end_orientation(approach_direction, fold_line_direction)
+    end_orientation = pitch_gripper_orientation(end_orientation, end_pitch_angle)
 
     orientations = [start_orientation, middle_orientation, end_orientation]
     times = [0, position_trajectory.duration / 2, position_trajectory.duration]
