@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 
@@ -109,3 +109,21 @@ def towel_twisted_grasps(
 #       |        |
 #       2------->3
 #     """
+
+
+def towel_edges_adjacent_to_edge(edge_index: int) -> Tuple[int, int]:
+    """
+    Returns the indices of the two edges adjacent to the given edge index.
+
+    0: (3, 1)
+    1: (0, 2)
+    2: (1, 3)
+    3: (2, 0)
+
+    Args:
+        edge_index: Index of the edge
+
+    Returns:
+        A tuple of the indices of the two adjacent edges
+    """
+    return ((edge_index - 1) % 4, (edge_index + 1) % 4)
