@@ -224,7 +224,7 @@ def get_manual_annotations(camera: Camera, annotation_spec: dict[str, Annotation
             current_mouse_point[0] = x, y
 
     window_name = "Annotation window"
-    cv2.namedWindow(window_name)
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
     cv2.setMouseCallback(window_name, mouse_callback)
 
     annotation_names = list(annotation_spec.keys())
@@ -235,7 +235,8 @@ def get_manual_annotations(camera: Camera, annotation_spec: dict[str, Annotation
 
     while True:
         image = camera.get_rgb_image()
-        image = ImageConverter(image).image_in_opencv_format
+        # image = ImageConverter(image).image_in_opencv_format # TODO: investigate why this doesn't work
+        image = ImageConverter.from_numpy_format(image).image_in_opencv_format
 
         if current_id >= num_annotations:
             banner_text = "All annotations collected. Press 'Enter' to confirm."
