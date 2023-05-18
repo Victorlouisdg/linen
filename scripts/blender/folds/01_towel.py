@@ -1,5 +1,6 @@
 import airo_blender as ab
 import bpy
+from linen.elemental.move_backwards import move_gripper_backwards_trajectory
 import numpy as np
 
 from linen.blender.curve import add_line_segment
@@ -57,15 +58,6 @@ fold_arc_trajectory_left = circular_fold_trajectory(
 fold_arc_trajectory_right = circular_fold_trajectory(
     grasp_location_right, grasp_direction_right, fold_line, start_pitch_angle=approach_angle
 )
-
-
-def move_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, speed: float):
-    start_position = start_pose[:3, 3]
-    gripper_backwards = -start_pose[:3, 2]  # Z is forward by our convention
-    end_position = start_position + distance * gripper_backwards
-    orientation = start_pose[:3, :3]
-    return linear_constant_orientation_trajectory(start_position, end_position, orientation, speed)
-
 
 retreat_trajectory_left = move_gripper_backwards_trajectory(fold_arc_trajectory_left.end, grasp_depth, 0.1)
 retreat_trajectory_right = move_gripper_backwards_trajectory(fold_arc_trajectory_right.end, grasp_depth, 0.1)
