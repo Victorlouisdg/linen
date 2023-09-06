@@ -53,17 +53,14 @@ def shirt_sleeve_and_side_fold_line(
     bottom_to_top /= np.linalg.norm(bottom_to_top)
 
     if left:
-        fold_line_point = armpit_left + offset_from_armpit_fraction * (
-            armpit_right - armpit_left
-        )
+        fold_line_point = armpit_left + offset_from_armpit_fraction * (armpit_right - armpit_left)
         fold_line_direction = bottom_to_top
     else:
-        fold_line_point = armpit_right + offset_from_armpit_fraction * (
-            armpit_left - armpit_right
-        )
+        fold_line_point = armpit_right + offset_from_armpit_fraction * (armpit_left - armpit_right)
         fold_line_direction = -bottom_to_top
 
     return fold_line_point, fold_line_direction
+
 
 # TODO consider this further
 # def shirt_middle_fold_line(
@@ -71,7 +68,6 @@ def shirt_sleeve_and_side_fold_line(
 # ) -> Tuple[Vector3DType, Vector3DType]:
 #     """
 #     The horizontal fold line that folds the shirt in half.
-
 
 
 #     +--+---+---+---+
@@ -84,11 +80,9 @@ def shirt_sleeve_and_side_fold_line(
 #         +----------+
 
 
-
-
 #     Args:
 #         keypoints: The keypoints of the perfectly flattend shirt.
-   
+
 #     Returns:
 #         The fold line as a tuple of a point and a direction vector.
 
@@ -112,7 +106,7 @@ def shirt_sleeve_and_side_fold_line(
 #     bottom_to_top = top_center - bottom_center
 #     bottom_to_top /= np.linalg.norm(bottom_to_top)
 
-#     neck_center = (neck_left + neck_right) / 2 
+#     neck_center = (neck_left + neck_right) / 2
 
 
 #     return fold_line_point, fold_line_direction

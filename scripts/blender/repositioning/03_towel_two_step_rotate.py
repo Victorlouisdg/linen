@@ -1,4 +1,3 @@
-from linen.geometry.rotate import rotate_point
 import airo_blender as ab
 import bpy
 import numpy as np
@@ -11,6 +10,7 @@ from linen.blender.render_setups import setup_cycles, setup_white_background
 from linen.blender.robotics.robotiq import add_animated_robotiq
 from linen.folding.fold_lines.towel import towel_fold_line
 from linen.folding.ordered_keypoints import get_counterclockwise_ordered_keypoints
+from linen.geometry.rotate import rotate_point
 from linen.grasping.slide_grasp import slide_grasp_trajectory
 from linen.grasping.towel.towel_grasps import towel_aligned_grasps, towel_twisted_grasps
 from linen.path.concatenate import concatenate_trajectories
@@ -40,15 +40,11 @@ for vertex in towel.data.vertices:
 
 
 keypoints_after_fold_3D = [towel.matrix_world @ v.co for v in towel.data.vertices]
-ordered_keypoints_after_fold = get_counterclockwise_ordered_keypoints(
-    keypoints_after_fold_3D
-)
+ordered_keypoints_after_fold = get_counterclockwise_ordered_keypoints(keypoints_after_fold_3D)
 
 
 grasp_depth = 0.05
-grasp_left, grasp_right = towel_aligned_grasps(
-    ordered_keypoints_after_fold, grasp_depth=grasp_depth
-)
+grasp_left, grasp_right = towel_aligned_grasps(ordered_keypoints_after_fold, grasp_depth=grasp_depth)
 grasp_location_left, grasp_direction_left = grasp_left
 grasp_location_right, grasp_direction_right = grasp_right
 
@@ -74,9 +70,7 @@ grasp_trajectory_right = slide_grasp_trajectory(
 )
 
 
-def slide_gripper_backwards_trajectory(
-    start_pose: np.ndarray, distance: float, speed: float
-):
+def slide_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, speed: float):
     start_position = start_pose[:3, 3]
     gripper_backwards = -start_pose[:3, 2]  # Z is forward by our convention
     gripper_backwards_projected = gripper_backwards.copy()
@@ -84,26 +78,16 @@ def slide_gripper_backwards_trajectory(
     gripper_backwards_projected /= np.linalg.norm(gripper_backwards_projected)
     end_position = start_position + distance * gripper_backwards_projected
     orientation = start_pose[:3, :3]
-    return linear_constant_orientation_trajectory(
-        start_position, end_position, orientation, speed
-    )
+    return linear_constant_orientation_trajectory(start_position, end_position, orientation, speed)
 
 
 drag_distance = towel_length / 4.0
-drag_trajectory_left = slide_gripper_backwards_trajectory(
-    grasp_trajectory_left.end, drag_distance, 0.05
-)
-drag_trajectory_right = slide_gripper_backwards_trajectory(
-    grasp_trajectory_right.end, drag_distance, 0.05
-)
+drag_trajectory_left = slide_gripper_backwards_trajectory(grasp_trajectory_left.end, drag_distance, 0.05)
+drag_trajectory_right = slide_gripper_backwards_trajectory(grasp_trajectory_right.end, drag_distance, 0.05)
 
 
-drag_translation_left = (
-    drag_trajectory_left.end[:3, 3] - grasp_trajectory_left.end[:3, 3]
-)
-drag_translation_right = (
-    drag_trajectory_right.end[:3, 3] - grasp_trajectory_right.end[:3, 3]
-)
+drag_translation_left = drag_trajectory_left.end[:3, 3] - grasp_trajectory_left.end[:3, 3]
+drag_translation_right = drag_trajectory_right.end[:3, 3] - grasp_trajectory_right.end[:3, 3]
 drag_translation_estimate = (drag_translation_left + drag_translation_right) / 2
 
 keypoints_after_drag = ordered_keypoints_after_fold + drag_translation_estimate
@@ -124,7 +108,7 @@ for vertex in towel.data.vertices:
     vertex.co = Vector(rotate_point(np.array(vertex.co), center, Z_axis, angle))
 
 reordered_keypoints = [rotated_keypoints[-1]] + rotated_keypoints[:-1]
-#reordered_keypoints = rotated_keypoints
+# reordered_keypoints = rotated_keypoints
 
 rotate_grasp_right, rotate_grasp_left = towel_twisted_grasps(
     reordered_keypoints, grasp_depth=grasp_depth, top_grasp_near0=False
@@ -155,12 +139,8 @@ rotate_trajectory_left, rotate_trajectory_right = rotate_trajectories(
 )
 
 
-trajectory_left = concatenate_trajectories(
-    [rotate_grasp_trajectory_left, rotate_trajectory_left]
-)
-trajectory_right = concatenate_trajectories(
-    [rotate_grasp_trajectory_right, rotate_trajectory_right]
-)
+trajectory_left = concatenate_trajectories([rotate_grasp_trajectory_left, rotate_trajectory_left])
+trajectory_right = concatenate_trajectories([rotate_grasp_trajectory_right, rotate_trajectory_right])
 
 
 # Visualization
@@ -172,9 +152,7 @@ towel.modifiers["Solidify"].thickness = 0.003
 towel.modifiers["Solidify"].offset = 0.0
 
 orange = [1.0, 0.27, 0.0, 1.0]
-center = (
-    rotate_trajectory_left.start[:3, 3] + rotate_trajectory_right.start[:3, 3]
-) / 2
+center = (rotate_trajectory_left.start[:3, 3] + rotate_trajectory_right.start[:3, 3]) / 2
 add_points([center], radius=0.01, color=orange)
 
 

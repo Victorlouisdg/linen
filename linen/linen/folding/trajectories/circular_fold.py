@@ -18,6 +18,7 @@ def circular_fold_middle_orientation(approach_direction: Vector3DType, fold_line
     middle_orientation = orientation_path(np.pi / 2)
     return middle_orientation
 
+
 def circular_fold_end_orientation(approach_direction: Vector3DType, fold_line_direction: Vector3DType) -> Path:
     start_orientation_flat = flat_orientation(approach_direction)
 

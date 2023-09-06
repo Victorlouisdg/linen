@@ -1,6 +1,5 @@
 import airo_blender as ab
 import bpy
-from linen.elemental.move_backwards import move_gripper_backwards_trajectory
 import numpy as np
 
 from linen.blender.curve import add_line_segment
@@ -8,13 +7,13 @@ from linen.blender.path import add_linen_trajectory_visualization
 from linen.blender.plane import add_plane
 from linen.blender.render_setups import setup_cycles, setup_white_background
 from linen.blender.robotics.robotiq import add_animated_robotiq
+from linen.elemental.move_backwards import move_gripper_backwards_trajectory
 from linen.folding.fold_lines.towel import towel_fold_line
 from linen.folding.ordered_keypoints import get_counterclockwise_ordered_keypoints
 from linen.folding.trajectories.circular_fold import circular_fold_trajectory
 from linen.grasping.slide_grasp import slide_grasp_trajectory
 from linen.grasping.towel.towel_grasps import towel_aligned_grasps
 from linen.path.concatenate import concatenate_trajectories
-from linen.path.linear import linear_constant_orientation_trajectory
 
 bpy.ops.object.delete()
 

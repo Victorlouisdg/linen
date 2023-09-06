@@ -1,5 +1,7 @@
-from linen.path.linear import linear_constant_orientation_trajectory
 import numpy as np
+
+from linen.path.linear import linear_constant_orientation_trajectory
+
 
 def slide_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, speed: float):
     start_position = start_pose[:3, 3]
@@ -10,4 +12,3 @@ def slide_gripper_backwards_trajectory(start_pose: np.ndarray, distance: float, 
     end_position = start_position + distance * gripper_backwards_projected
     orientation = start_pose[:3, :3]
     return linear_constant_orientation_trajectory(start_position, end_position, orientation, speed)
-

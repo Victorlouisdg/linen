@@ -1,17 +1,14 @@
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
 import numpy as np
 from airo_typing import Vector3DType
 
+
 def shirt_sleeve_and_waist_grasps(
-    keypoints: Dict[str, Vector3DType],
-    sleeve_inset = 0.05,
-    waist_inset = 0.05,
-    grasp_depth = 0.05,
-    left=True
+    keypoints: Dict[str, Vector3DType], sleeve_inset=0.05, waist_inset=0.05, grasp_depth=0.05, left=True
 ) -> Tuple[Tuple[Vector3DType, Vector3DType], Tuple[Vector3DType, Vector3DType]]:
     """
-    The vertical fold line that fold the side of a shirt inwards, including the sleeve.
+    Two grasp locations to fold the side of a shirt.
 
               ^
       |       |
@@ -29,10 +26,14 @@ def shirt_sleeve_and_waist_grasps(
 
     Args:
         keypoints: The keypoints of the shirt.
-    
+        sleeve_inset: How far from the end of the sleeve to grasp.
+        waist_inset: How far from the waist to grasp.
+        grasp_depth: How far to move the gripper into the shirt.
+        left: Whether to grasp the left or right side of the shirt.
+
 
     Returns:
-
+        One grasp on the sleeve and one grasp on the waist.
     """
 
     neck_left = keypoints["neck_left"]
@@ -40,7 +41,6 @@ def shirt_sleeve_and_waist_grasps(
     armpit_left = keypoints["armpit_left"]
     waist_left = keypoints["waist_left"]
     sleeve_top_left = keypoints["sleeve_left_top"]
-
 
     neck_right = keypoints["neck_right"]
     shoulder_right = keypoints["shoulder_right"]
@@ -56,14 +56,13 @@ def shirt_sleeve_and_waist_grasps(
     bottom_to_top = top_center - bottom_center
     bottom_to_top /= np.linalg.norm(bottom_to_top)
 
-
     sleeve_grasp_approach_direction = -bottom_to_top
     waist_grasp_approach_direction = bottom_to_top
 
     if left:
         sleeve_to_shoulder = shoulder_left - sleeve_top_left
         sleeve_to_shoulder /= np.linalg.norm(sleeve_to_shoulder)
-        sleeve_grasp_location = sleeve_top_left + sleeve_inset * sleeve_to_shoulder 
+        sleeve_grasp_location = sleeve_top_left + sleeve_inset * sleeve_to_shoulder
         waist_left_to_right = waist_right - waist_left
         waist_grasp_location = waist_left + waist_inset * waist_left_to_right
     else:
@@ -74,7 +73,7 @@ def shirt_sleeve_and_waist_grasps(
         waist_grasp_location = waist_right + waist_inset * waist_right_to_left
 
     # Add grasp depth
-    sleeve_grasp_location += grasp_depth * sleeve_grasp_approach_direction 
+    sleeve_grasp_location += grasp_depth * sleeve_grasp_approach_direction
     waist_grasp_location += grasp_depth * waist_grasp_approach_direction
 
     sleeve_grasp = (sleeve_grasp_location, sleeve_grasp_approach_direction)
