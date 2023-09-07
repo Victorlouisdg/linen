@@ -14,13 +14,18 @@ def add_cylinder_with_origin_in_base(radius_height_ratio: float = 0.05) -> bpy.t
     return cylinder
 
 
-def add_frame(pose: np.ndarray = np.identity(4), size: float = 0.1, name: str = "frame") -> bpy.types:
+def add_frame(
+    pose: np.ndarray = np.identity(4),
+    size: float = 0.1,
+    name: str = "frame",
+    radius_height_ratio: float = 0.05,
+) -> bpy.types:
     bpy.ops.object.empty_add(type="ARROWS")
     frame = bpy.context.object
 
-    X = add_cylinder_with_origin_in_base()
-    Y = add_cylinder_with_origin_in_base()
-    Z = add_cylinder_with_origin_in_base()
+    X = add_cylinder_with_origin_in_base(radius_height_ratio)
+    Y = add_cylinder_with_origin_in_base(radius_height_ratio)
+    Z = add_cylinder_with_origin_in_base(radius_height_ratio)
 
     X.name = "X"
     Y.name = "Y"
