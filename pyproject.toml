@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "linen"
+version = "0.0.1"
+authors = [
+  { name="Victor-Louis De Gusseme", email="victorlouisdg@gmail.com" },
+]
+description = "Tools for robotic cloth manipulation."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "numdifftools",
+]
+
+[project.urls]
+Homepage = "https://github.com/Victorlouisdg/linen"
+Issues = "https://github.com/Victorlouisdg/linen/issues"
+
+
+[tool.pytest.ini_options]
+python_files = "test_*.py"
