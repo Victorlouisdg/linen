@@ -2,6 +2,7 @@ import numpy as np
 
 from linen.path.linear import linear_constant_orientation_trajectory
 
+
 def move_pose_backwards(start_pose: np.ndarray, distance: float):
     start_position = start_pose[:3, 3]
     gripper_backwards = -start_pose[:3, 2]  # Z is forward by our convention
